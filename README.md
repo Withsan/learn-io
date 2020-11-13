@@ -1,2 +1,2 @@
-# learnNetty
-netty学习项目
+# java io学习
+主要学习java nio和netty
