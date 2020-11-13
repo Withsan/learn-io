@@ -1,4 +1,4 @@
-package com.violin.buffer;
+package com.violin.nio.buffer;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.violin.channel;
+package com.violin.nio.channel;
 
 import org.junit.Test;
 
