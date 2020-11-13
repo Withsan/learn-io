@@ -18,20 +18,11 @@ public class LearnBuffer {
         // 申请48byte的buffer
         ByteBuffer byteBuffer = ByteBuffer.allocate(48);
         fileChannel.read(byteBuffer);
-        byte [] dts = new byte[3];
+        byteBuffer.flip();
+        byte [] dts = new byte[2];
+        // 需要获取的数据在dts数组中，返回值认为buffer本身
         ByteBuffer dtsBuffer = byteBuffer.get(dts);
         System.out.println(new String(dts));
-    }
-    @Test
-    public void test()  {
-        byte [] src = new byte[48];
-        for (int i = 0; i < src.length; i++) {
-            src[i]=(byte) i;
-        }
-        byte [] dst = new byte[3];
-        System.arraycopy(src, 14, dst, 0, 3);
-        for (int i = 0; i < dst.length; i++) {
-            System.out.println(dst[i]);
-        }
+        System.out.println(new String(dtsBuffer.array()));
     }
 }
