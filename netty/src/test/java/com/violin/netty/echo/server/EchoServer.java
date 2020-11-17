@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.CharsetUtil;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
@@ -18,24 +19,29 @@ public class EchoServer {
     public void server() throws InterruptedException {
         EventLoopGroup boss = new NioEventLoopGroup();
         EventLoopGroup work = new NioEventLoopGroup();
-        ServerBootstrap bootstrap = new ServerBootstrap()
-                .group(boss, work)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new EchoServerHandler());
-                    }
-                });
-        ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(8080)).sync();
-        channelFuture.channel().closeFuture().sync();
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap()
+                    .group(boss, work)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        protected void initChannel(SocketChannel ch) {
+                            ch.pipeline().addLast(new EchoServerHandler());
+                        }
+                    });
+            ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(8080)).sync();
+            channelFuture.channel().closeFuture().sync();
+        } finally {
+            boss.shutdownGracefully();
+            work.shutdownGracefully();
+        }
     }
 
     class EchoServerHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
             ByteBuf byteBufMsg = (ByteBuf) msg;
-            System.out.println(new String(byteBufMsg.array()));
-            ctx.writeAndFlush(msg);
+            System.out.println(byteBufMsg.toString(CharsetUtil.UTF_8));
+            ctx.writeAndFlush(byteBufMsg);
         }
 
         @Override
